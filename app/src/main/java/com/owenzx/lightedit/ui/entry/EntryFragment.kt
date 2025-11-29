@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.owenzx.lightedit.ui.album.AlbumFragment
 import com.owenzx.lightedit.databinding.FragmentEntryBinding
 
 class EntryFragment : Fragment() {
@@ -22,6 +24,33 @@ class EntryFragment : Fragment() {
     ): View {
         _binding = FragmentEntryBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 从相册选择照片：跳转到 AlbumFragment
+        binding.btnFromAlbum.setOnClickListener {
+            parentFragmentManager
+                .beginTransaction()
+                .replace(
+                    // MainActivity 中 Fragment 容器的 id
+                    (requireActivity()
+                        .findViewById<View>(com.owenzx.lightedit.R.id.fragment_container_view)).id,
+                    AlbumFragment()
+                )
+                .addToBackStack(null)  // 加入返回栈，按返回键能回到 Entry
+                .commit()
+        }
+
+        // 拍一张照片：暂时先保留 Toast 占位
+        binding.btnTakePhoto.setOnClickListener {
+            Toast.makeText(
+                requireContext(),
+                "TODO: 打开相机（后面实现）",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     override fun onDestroyView() {
