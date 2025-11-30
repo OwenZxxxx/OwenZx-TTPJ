@@ -8,8 +8,9 @@ import com.owenzx.lightedit.R
 import com.owenzx.lightedit.databinding.ItemPhotoGridBinding
 
 class AllPhotosAdapter(
-    private val items: List<Int>,   // 暂时用 Int 做假数据（比如 0..29）
-    private val onItemClick: (position: Int) -> Unit
+    private val items: List<Int>,   // 暂时用 Int 做假数据
+    private val onItemClick: (position: Int) -> Unit,
+    private val onPreviewClick: (position: Int) -> Unit
 ) : RecyclerView.Adapter<AllPhotosAdapter.PhotoViewHolder>() {
 
     inner class PhotoViewHolder(
@@ -21,8 +22,14 @@ class AllPhotosAdapter(
             // 这里先全部用 ic_launcher 占位，后面会换成真实缩略图
             binding.imageThumbnail.setImageResource(R.mipmap.ic_launcher)
 
-            binding.root.setOnClickListener {
+            // 点击图片区域：进入编辑
+            binding.imageThumbnail.setOnClickListener {
                 onItemClick(position)
+            }
+
+            // 点击右下角预览 icon：进入预览
+            binding.iconPreview.setOnClickListener {
+                onPreviewClick(position)
             }
         }
     }
