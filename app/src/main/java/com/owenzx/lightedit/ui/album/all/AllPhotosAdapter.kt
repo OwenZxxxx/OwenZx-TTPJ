@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.owenzx.lightedit.R
+import com.owenzx.lightedit.data.album.PhotoItem
 import com.owenzx.lightedit.databinding.ItemPhotoGridBinding
 
 class AllPhotosAdapter(
-    private val items: List<Int>,   // 暂时用 Int 做假数据
-    private val onItemClick: (position: Int) -> Unit,
-    private val onPreviewClick: (position: Int) -> Unit
+    private var items: List<PhotoItem>,
+    private val onItemClick: (PhotoItem) -> Unit,
+    private val onPreviewClick: (PhotoItem) -> Unit
 ) : RecyclerView.Adapter<AllPhotosAdapter.PhotoViewHolder>() {
 
     inner class PhotoViewHolder(
@@ -18,20 +18,26 @@ class AllPhotosAdapter(
         private val binding: ItemPhotoGridBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(position: Int) {
-            // 这里先全部用 ic_launcher 占位，后面会换成真实缩略图
-            binding.imageThumbnail.setImageResource(R.mipmap.ic_launcher)
+        fun bind(photo: PhotoItem) {
+            /// 直接 URI 显示（之后会用线程生成缩略图优化）
+            binding.imageThumbnail.setImageURI(photo.uri)
 
             // 点击图片区域：进入编辑
             binding.imageThumbnail.setOnClickListener {
-                onItemClick(position)
+                onItemClick(photo)
             }
 
             // 点击右下角预览 icon：进入预览
             binding.iconPreview.setOnClickListener {
-                onPreviewClick(position)
+                onPreviewClick(photo)
             }
         }
+    }
+
+    // Fragment 里异步加载完数据后更新
+    fun submitList(newList: List<PhotoItem>) {
+        items = newList
+        notifyDataSetChanged()
     }
 
     // 创建每个格子的布局
@@ -43,8 +49,9 @@ class AllPhotosAdapter(
 
     // 把特定数据绑定到特定的item 滑出屏幕后复用 ViewHolder → bind 下一个位置
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        holder.bind(position)
+        holder.bind(items[position])
     }
 
     override fun getItemCount(): Int = items.size
+
 }

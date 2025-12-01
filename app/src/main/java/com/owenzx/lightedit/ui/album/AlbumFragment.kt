@@ -15,6 +15,8 @@ import com.owenzx.lightedit.core.permissions.MediaPermissionHelper
 import com.owenzx.lightedit.databinding.FragmentAlbumBinding
 import com.owenzx.lightedit.ui.album.all.AllPhotosFragment
 import com.owenzx.lightedit.ui.album.folder.FolderPhotosFragment
+// 测试扫描图片
+import com.owenzx.lightedit.core.utils.MediaScanHelper
 
 
 class AlbumFragment: Fragment() {
@@ -49,6 +51,9 @@ class AlbumFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        MediaScanHelper.scanPicturesRoot(requireContext())
+
 
         // 设置 ViewPager2 的 Adapter
         val pagerAdapter = AlbumPagerAdapter(this)

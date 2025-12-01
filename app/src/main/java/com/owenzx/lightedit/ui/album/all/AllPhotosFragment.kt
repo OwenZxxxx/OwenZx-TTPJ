@@ -1,16 +1,21 @@
 package com.owenzx.lightedit.ui.album.all
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.owenzx.lightedit.R
+import com.owenzx.lightedit.core.permissions.MediaPermissionHelper
+import com.owenzx.lightedit.data.album.MediaStoreAlbumRepository
+import com.owenzx.lightedit.data.album.PhotoItem
 import com.owenzx.lightedit.databinding.FragmentAllPhotosBinding
 import com.owenzx.lightedit.ui.editor.EditorFragment
 import com.owenzx.lightedit.ui.preview.PreviewFragment
+import java.util.concurrent.Executors
 
 class AllPhotosFragment : Fragment() {
 
@@ -18,6 +23,8 @@ class AllPhotosFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: AllPhotosAdapter
+
+    private val executor = Executors.newSingleThreadExecutor()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,40 +38,99 @@ class AllPhotosFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // TODO：后面这里会换成真实图片数据
-        val fakeItems = List(30) { it }  // 简单的 0..29 假数据
+        setupRecyclerView()
 
+        if (!hasPermission()) {
+            showNoPermission()
+        } else {
+            loadPhotos()
+        }
+    }
+
+    private fun hasPermission(): Boolean {
+        val p = MediaPermissionHelper.getReadImagesPermission()
+        return ContextCompat.checkSelfPermission(requireContext(), p) ==
+                PackageManager.PERMISSION_GRANTED
+    }
+
+    // 设置Recyclerview
+    private fun setupRecyclerView() {
         adapter = AllPhotosAdapter(
-            fakeItems,
-            onItemClick = { position ->
-                // 点击图片区域：进入编辑器
-                val fm = requireActivity().supportFragmentManager
-                fm.beginTransaction()
-                    .replace(
-                        requireActivity().findViewById<View>(R.id.fragment_container_view).id,
-                        EditorFragment()
-                    )
-                    .addToBackStack(null)
-                    .commit()
-            },
-            onPreviewClick = { position ->
-                // 点击右下角 icon：进入预览
-                // 要用的是 Activity 的 FragmentManager
-                val fm = requireActivity().supportFragmentManager
-                fm.beginTransaction()
-                    .replace(
-                        requireActivity().findViewById<View>(R.id.fragment_container_view).id,
-                        PreviewFragment()
-                    )
-                    .addToBackStack(null)
-                    .commit()
-            }
+            emptyList(),
+            onItemClick = { photo -> openEditor(photo) },
+            onPreviewClick = { photo -> openPreview(photo) }
         )
 
-        val spanCount = 3  // 先搞3列，后面可以根据屏幕宽度动态算
-
-        binding.recyclerAllPhotos.layoutManager = GridLayoutManager(requireContext(), spanCount)
+        binding.recyclerAllPhotos.layoutManager = GridLayoutManager(requireContext(), 3)
         binding.recyclerAllPhotos.adapter = adapter
+    }
+
+    // 打开编辑界面
+    private fun openEditor(photo: PhotoItem) {
+        val fm = requireActivity().supportFragmentManager
+        fm.beginTransaction()
+            .replace(R.id.fragment_container_view, EditorFragment.newInstance(photo.uri))
+            .addToBackStack(null)
+            .commit()
+    }
+
+    // 打开预览界面
+    private fun openPreview(photo: PhotoItem) {
+        val fm = requireActivity().supportFragmentManager
+        fm.beginTransaction()
+            .replace(R.id.fragment_container_view, PreviewFragment.newInstance(photo.uri))
+            .addToBackStack(null)
+            .commit()
+    }
+
+    // 展示没有权限信息
+    private fun showNoPermission() {
+        binding.recyclerAllPhotos.visibility = View.GONE
+        binding.tvState.visibility = View.VISIBLE
+        binding.tvState.text = "无相册权限，无法加载本地图片"
+    }
+
+    // 展示相册为空信息
+    private fun showEmpty() {
+        binding.recyclerAllPhotos.visibility = View.GONE
+        binding.tvState.visibility = View.VISIBLE
+        binding.tvState.text = "相册为空"
+    }
+
+    // 调整layout
+    private fun showContent() {
+        binding.recyclerAllPhotos.visibility = View.VISIBLE
+        binding.tvState.visibility = View.GONE
+    }
+
+    // 加载图片
+    private fun loadPhotos() {
+
+        binding.recyclerAllPhotos.visibility = View.GONE
+        binding.tvState.visibility = View.VISIBLE
+        binding.tvState.text = "正在加载相册..."
+
+        val resolver = requireContext().contentResolver
+
+        executor.execute {
+
+            val photos: List<PhotoItem> = try {
+                MediaStoreAlbumRepository.queryAllPhotos(resolver)
+            } catch (e: SecurityException) {
+                emptyList()
+            }
+
+            requireActivity().runOnUiThread {
+                if (!isAdded) return@runOnUiThread
+
+                if (photos.isEmpty()) {
+                    showEmpty()
+                } else {
+                    showContent()
+                    adapter.submitList(photos)
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
