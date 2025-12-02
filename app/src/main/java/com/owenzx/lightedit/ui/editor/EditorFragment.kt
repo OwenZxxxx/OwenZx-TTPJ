@@ -41,15 +41,19 @@ class EditorFragment : Fragment() {
         return binding.root
     }
 
-    // 后面所有编辑相关的 UI 初始化都放在这里：
-    // - 显示图片（必须）
-    // - 设置手势监听
-    // - 初始化裁剪框、调节滑条、工具栏按钮等
+    // 这里我们来接 UI + 展示图片
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 目前只做最小闭环：展示图片
-        binding.imageEditTarget.setImageURI(photoUri)
+        // 设置标题（可选）
+        binding.tvEditorTitle.text = "编辑图片"
+
+        // 临时方案：直接用 setImageURI 显示图片
+        // 之后我们会把它换成“可缩放可裁剪的自定义 View”
+        binding.imageEditCanvas.setImageURI(photoUri)
+
+        // 按钮现在先不做逻辑，后面一个个接
+        // binding.btnToolCrop.setOnClickListener { ... }
     }
 
     override fun onDestroyView() {
