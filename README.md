@@ -145,26 +145,18 @@
 
 > 实际代码结构可能会随开发略有调整，但整体分层不变。
 
-├── ui/                    # 界面层（Activity / Fragment / 自定义 View）
-│   ├── main/              # MainActivity & 导航
-│   ├── album/             # 相册列表 + 文件夹 Tab + 预览
-│   ├── editor/            # 编辑器界面（缩放 / 裁剪 / 调节 / 文字等）
-│   └── common/            # 通用 UI 组件、基类
-│
-├── data/                  # 数据访问层（相册、相机、保存）
-│   ├── album/             # 媒体扫描、分组、缩略图
-│   ├── camera/            # CameraX/相机封装
-│   └── save/              # 保存到相册逻辑
-│
-├── editor/                # 核心编辑逻辑（算法层）
-│   ├── bitmap/            # Bitmap 缩放、裁剪、转换工具
-│   ├── transform/         # 旋转与翻转
-│   ├── adjust/            # 亮度/对比度、滤镜（如实现）
-│   └── overlay/           # 文本、贴纸等前景元素模型与绘制
-│
-└── core/                  # 通用基础设施
-    ├── permissions/       # 权限辅助
-    └── utils/             # 工具类、日志等
+app/
+ └── src/main/java/com/owenzx/lightedit/
+     ├── ui/
+     │   ├── main/           # MainActivity & 导航
+     │   ├── album/          # 相册列表 & 文件夹 Tab & 预览
+     │   ├── camera/         # CameraX 拍照
+     │   └── editor/         # 编辑器（缩放 / 裁剪 / 旋转 / 调色 / 文字）
+     │       ├── crop/       # 裁剪 Overlay & 比例逻辑
+     │       ├── text/       # TextOverlayView & TextElement（文字叠加）
+     │       └── view/       # ZoomableImageView 等自定义 View
+     ├── data/               # 媒体加载、保存相关
+     └── core/               # 通用工具类、扩展函数等
 
 详细架构设计与 UML 类图、时序图将记录在：`docs/architecture.md`
 
@@ -267,37 +259,11 @@ git push origin v1.0.0
 - requirements.md：详细需求文档（功能要求、性能要求、异常处理）
 - git-workflow.md：分支策略、Commit 规范、PR 规范
 - planning.md：从 11/22–12/04 的完整倒排计划
-- architecture.md：整体架构说明、UML 类图、时序图（开发后期补充）
-- test-plan.md：测试案例、兼容性测试、性能测试（测试阶段补充）
-- learning-summary.md：学习与探索总结（最终提交前补充）
+- architecture.md：整体架构说明、UML 类图、时序图
+- learning-summary.md：学习与探索总结
 
 ---
 
-## 9. 当前进度（2024-11-24）
-
-当前处于 **Day 1：工程初始化阶段**，按计划正在进行以下内容：
-
-### 🔨 今日目标（Day 1）
-- 创建 GitHub 仓库；
-- 初始化项目目录结构；
-- 创建 main / develop 分支；
-- 创建 docs 目录；
-- 编写以下文档的初版：
-  - README.md
-  - requirements.md
-  - git-workflow.md
-  - planning.md
-- 创建 GitHub Project 看板；
-- 创建核心 Issue（相册模块、相机模块、编辑功能等）；
-- 创建Wiki page
-- 完成工程化流程的基础搭建，为后续 Android 项目开发打好结构基础。
-
-### 📌 当前状态
-- 正在进行 Day 1 规划中的文档编写与仓库初始化工作；
-- 预计今天将完成所有工程化准备工作，并在 Day 2 开始 Android 工程搭建（Activity + Fragment + 包结构）。
-
----
-
-## 10. License
+## 9. License
 
 本项目为课程作业，不提供公开 License。如需参考，请联系课程导师或按学术规范引用。
