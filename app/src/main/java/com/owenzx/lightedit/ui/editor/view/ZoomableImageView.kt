@@ -56,6 +56,9 @@ class ZoomableImageView @JvmOverloads constructor(
     // 表示剪裁功能开启
     private var cropModeEnabled: Boolean = false
 
+    // 是否触发初始适配
+    private var autoInitFitEnabled: Boolean = true
+
     // 缩放手势检测器
     private val scaleDetector = ScaleGestureDetector(
         context,
@@ -104,8 +107,10 @@ class ZoomableImageView @JvmOverloads constructor(
         if (bm != null) {
             imageWidth = bm.width
             imageHeight = bm.height
-            hasInitFit = false
-            post { applyInitialFitIfPossible() }
+            if (autoInitFitEnabled) {   // 只有开关为 true 才做初始适配
+                hasInitFit = false
+                post { applyInitialFitIfPossible() }
+            }
         } else {
             imageWidth = 0
             imageHeight = 0
@@ -117,8 +122,11 @@ class ZoomableImageView @JvmOverloads constructor(
         drawable?.let { d ->
             imageWidth = d.intrinsicWidth
             imageHeight = d.intrinsicHeight
-            hasInitFit = false
-            post { applyInitialFitIfPossible() }
+
+            if (autoInitFitEnabled) {
+                hasInitFit = false
+                post { applyInitialFitIfPossible() }
+            }
         } ?: run {
             imageWidth = 0
             imageHeight = 0
@@ -130,8 +138,11 @@ class ZoomableImageView @JvmOverloads constructor(
         drawable?.let { d ->
             imageWidth = d.intrinsicWidth
             imageHeight = d.intrinsicHeight
-            hasInitFit = false
-            post { applyInitialFitIfPossible() }
+
+            if (autoInitFitEnabled) {
+                hasInitFit = false
+                post { applyInitialFitIfPossible() }
+            }
         } ?: run {
             imageWidth = 0
             imageHeight = 0
@@ -469,6 +480,9 @@ class ZoomableImageView @JvmOverloads constructor(
         }
     }
 
+    fun setAutoInitFitEnabled(enabled: Boolean) {
+        autoInitFitEnabled = enabled
+    }
 
     private fun cancelSettleAnimator() {
         settleAnimator?.cancel()
