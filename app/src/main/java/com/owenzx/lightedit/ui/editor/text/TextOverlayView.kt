@@ -28,10 +28,10 @@ class TextOverlayView @JvmOverloads constructor(
     // 为 true 时，所有触摸事件都由 TextOverlayView 处理，不再传到底图。
     var isTextToolActive: Boolean = false
 
-    /** 双击某个文本框时回调（交给 Fragment 弹出文字输入面板） */
+    // 双击某个文本框时回调（交给 Fragment 弹出文字输入面板）
     var onTextBoxDoubleTap: (() -> Unit)? = null
 
-    /** 点击选中文字框的右下角 + 按钮时回调（交给 Fragment 再创建一个文本框） */
+    // 点击选中文字框的右下角 + 按钮时回调（交给 Fragment 再创建一个文本框）
     var onRequestNewTextBox: (() -> Unit)? = null
 
     // ========== 内部数据结构 ==========
@@ -161,7 +161,7 @@ class TextOverlayView @JvmOverloads constructor(
     fun getSelectedElement(): TextElement? =
         if (selectedIndex in elements.indices) elements[selectedIndex] else null
 
-    /** 如果没有选中任何元素，但列表非空，则自动选中最后一个；返回选中的元素。 */
+    // 如果没有选中任何元素，但列表非空，则自动选中最后一个；返回选中的元素
     fun ensureOneSelected(): TextElement? {
         if (selectedIndex !in elements.indices && elements.isNotEmpty()) {
             selectedIndex = elements.lastIndex

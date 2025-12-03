@@ -266,7 +266,7 @@ class EditorFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
 
-        // 顶部保存
+        // 顶部保存：合成当前画面 + 水印，然后写入系统相册
         binding.btnEditorSave.setOnClickListener {
             // 禁止重复点击
             if (!binding.btnEditorSave.isEnabled) return@setOnClickListener
